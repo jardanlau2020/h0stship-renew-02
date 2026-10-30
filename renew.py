@@ -214,7 +214,10 @@ def renew_until_full(s, server_id: str) -> tuple[Outcome, str, object]:
 # ---------------------------------------------------------------- 主流程
 
 def main() -> int:
-    if not USER or not PASS:
+    # 2026-10-30：純 cookie 模式（JEXACTYL_SESSION）唔需要帳密。
+    # 舊碼硬性要求 PANEL_USER / PANEL_PASS → 02 號機（只有 cookie）一跑就
+    # 「⚠️ 缺少 PANEL_USER / PANEL_PASS · 请登录面板手动处理」（run 40991622421）。
+    if (not USER or not PASS) and not env.get("JEXACTYL_SESSION", ""):
         report = RenewReport(SERVICE)
         report.add("凭证", Outcome.FAILED, detail="缺少 PANEL_USER / PANEL_PASS")
         return report.finish()
